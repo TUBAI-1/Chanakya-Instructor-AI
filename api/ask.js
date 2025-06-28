@@ -1,17 +1,8 @@
-import express from "express";
-import cors from "cors";
 import { GoogleGenAI } from "@google/genai";
 
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static('.'));
-
-// Initialize Gemini AI with API key
-const apiKey = process.env.GEMINI_API_KEY || "AIzaSyCgnmDve7BFx_JEZTdki_cg7_0T6W4D_cg";
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ 
+  apiKey: process.env.GEMINI_API_KEY || "AIzaSyCgnmDve7BFx_JEZTdki_cg7_0T6W4D_cg" 
+});
 
 const systemPrompt = `You are a Data structure and Algorithm Instructor. You will only reply to the problem related to 
 Data structure and Algorithm. You have to solve query of user in simplest way
@@ -22,14 +13,29 @@ You will reply: You dumb ask me some sensible question, like this message you ca
 You have to reply him rudely if question is not related to Data structure and Algorithm.
 Else reply him politely with simple explanation`;
 
-// API endpoint for questions
-app.post("/api/ask", async (req, res) => {
+export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const { question } = req.body;
-  
+
   if (!question) {
     return res.status(400).json({ error: "Missing question" });
   }
-  
+
   try {
     console.log('Processing question:', question);
     
@@ -39,10 +45,10 @@ app.post("/api/ask", async (req, res) => {
         { role: "user", parts: [{ text: systemPrompt + "\n\nUser question: " + question }] }
       ],
     });
-    
+
     console.log('Response received from Gemini');
-    res.json({ answer: response.text });
-    
+    res.status(200).json({ answer: response.text });
+
   } catch (error) {
     console.error('Gemini API Error:', error);
     res.status(500).json({ 
@@ -50,35 +56,4 @@ app.post("/api/ask", async (req, res) => {
       details: error.message 
     });
   }
-});
-
-// Health check endpoint
-app.get("/api/health", (req, res) => {
-  res.json({ 
-    status: "OK", 
-    message: "Chanakya AI is running!",
-    apiKey: apiKey ? "Set" : "Not set"
-  });
-});
-
-// Serve the main page
-app.get("/", (req, res) => {
-  res.sendFile('index.html', { root: '.' });
-});
-
-// Handle all other routes
-app.get("*", (req, res) => {
-  res.sendFile('index.html', { root: '.' });
-});
-
-// Export for Vercel
-export default app;
-
-// Start server for local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`API Key status: ${apiKey ? "Set" : "Not set"}`);
-  });
 } 

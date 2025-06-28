@@ -10,6 +10,7 @@ A modern, dark-mode AI-powered coding instructor that helps developers learn pro
 - **Code Highlighting**: Syntax highlighting for code examples
 - **Quick Actions**: Pre-built questions for common programming topics
 - **Real-time Responses**: Fast, accurate answers to your coding questions
+- **Vercel Ready**: Easy deployment to Vercel platform
 
 ## 🛠️ Tech Stack
 
@@ -18,14 +19,18 @@ A modern, dark-mode AI-powered coding instructor that helps developers learn pro
 - **AI**: Google Gemini AI API
 - **Styling**: Custom CSS with dark theme
 - **Code Highlighting**: Prism.js
+- **Deployment**: Vercel
 
 ## 📋 Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - npm or yarn
 - Google Gemini API key
+- Vercel account (for deployment)
 
 ## 🚀 Installation
+
+### Local Development
 
 1. **Clone the repository**
    ```bash
@@ -45,21 +50,40 @@ A modern, dark-mode AI-powered coding instructor that helps developers learn pro
    const ai = new GoogleGenAI({ apiKey: "YOUR_API_KEY_HERE" });
    ```
 
-4. **Start the backend server**
+4. **Start the development server**
    ```bash
-   node server.js
+   npm start
    ```
-   The backend will run on `http://localhost:3001`
+   The application will run on `http://localhost:3001`
 
-5. **Start the frontend server**
+### Vercel Deployment
+
+1. **Install Vercel CLI**
    ```bash
-   python -m http.server 8000
+   npm i -g vercel
    ```
-   Or use any other static file server. The frontend will be available at `http://localhost:8000`
+
+2. **Login to Vercel**
+   ```bash
+   vercel login
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   vercel env add GEMINI_API_KEY
+   ```
+   Enter your Gemini API key when prompted.
+
+4. **Deploy to Vercel**
+   ```bash
+   vercel --prod
+   ```
+
+5. **Your app will be live at**: `https://your-app-name.vercel.app`
 
 ## 🎯 Usage
 
-1. Open your browser and navigate to `http://localhost:8000`
+1. Open your browser and navigate to the application URL
 2. Type your coding question in the text area
 3. Click "Ask Chanakya AI" or press Enter
 4. Get instant, detailed answers with code examples
@@ -71,6 +95,7 @@ Chanakya-Instructor-AI/
 ├── index.html          # Main frontend interface
 ├── server.js           # Backend Express server
 ├── package.json        # Node.js dependencies
+├── vercel.json         # Vercel deployment configuration
 ├── .gitignore          # Git ignore rules
 ├── README.md           # Project documentation
 ├── DSA.js              # Example Gemini API usage
@@ -81,14 +106,20 @@ Chanakya-Instructor-AI/
 ## 🔧 Configuration
 
 ### Backend Configuration
-- **Port**: Default is 3001 (configurable in `server.js`)
-- **CORS**: Enabled for local development
+- **Port**: Default is 3001 (configurable via PORT environment variable)
+- **CORS**: Enabled for cross-origin requests
 - **API Endpoint**: `/ask` for question processing
+- **Static Files**: Served from root directory
 
 ### Frontend Configuration
-- **Backend URL**: Configured to `http://localhost:3001/ask`
+- **Backend URL**: Configured to use relative paths for deployment
 - **Theme**: Dark mode with purple/blue accent colors
 - **Responsive**: Works on desktop and mobile devices
+
+### Vercel Configuration
+- **Build**: Automatic Node.js build
+- **Routes**: API routes and static file serving
+- **Environment Variables**: Secure API key storage
 
 ## 🎨 Features
 
@@ -115,9 +146,10 @@ Chanakya-Instructor-AI/
 
 ## 🔒 Security
 
-- API keys are stored securely on the backend
+- API keys are stored securely as environment variables
 - No sensitive information exposed to the frontend
 - CORS configured for secure cross-origin requests
+- Production-ready error handling
 
 ## 🐛 Troubleshooting
 
@@ -125,15 +157,29 @@ Chanakya-Instructor-AI/
 
 1. **API Key Errors**
    - Ensure your Gemini API key is valid and active
-   - Check that the key is correctly set in `server.js`
+   - Check that the key is correctly set in environment variables
+   - For Vercel: Verify the environment variable is set in the dashboard
 
 2. **Backend Connection Issues**
-   - Verify the backend server is running on port 3001
+   - Verify the server is running on the correct port
    - Check for any firewall or network restrictions
+   - For Vercel: Check the deployment logs
 
 3. **Frontend Not Loading**
-   - Ensure the static file server is running
+   - Ensure all static files are properly served
    - Check browser console for JavaScript errors
+   - Verify the API endpoint is accessible
+
+### Vercel Deployment Issues
+
+1. **Build Failures**
+   - Check that Node.js version is 18 or higher
+   - Verify all dependencies are in package.json
+   - Check Vercel build logs for specific errors
+
+2. **Environment Variables**
+   - Ensure GEMINI_API_KEY is set in Vercel dashboard
+   - Redeploy after adding environment variables
 
 ## 🤝 Contributing
 
@@ -152,6 +198,7 @@ This project is licensed under the ISC License.
 - Google Gemini AI for providing the AI capabilities
 - Prism.js for code syntax highlighting
 - Font Awesome for icons
+- Vercel for seamless deployment
 - The open-source community for inspiration
 
 ## 📞 Support
@@ -160,4 +207,4 @@ If you encounter any issues or have questions, please open an issue on GitHub.
 
 ---
 
-**Built with ❤️ for the developer community** 
+**Built with ❤️ for the developer community**
