@@ -4,8 +4,13 @@ import { GoogleGenAI } from "@google/genai";
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middleware - Updated CORS for Vercel deployment
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 app.use(express.json());
 app.use(express.static('.'));
 
@@ -24,9 +29,14 @@ Else reply him politely with simple explanation`;
 
 // API endpoint for questions
 app.post("/api/ask", async (req, res) => {
+  console.log('API endpoint hit: /api/ask');
+  console.log('Request headers:', req.headers);
+  console.log('Request body:', req.body);
+  
   const { question } = req.body;
   
   if (!question) {
+    console.log('Missing question in request');
     return res.status(400).json({ error: "Missing question" });
   }
   
@@ -58,6 +68,15 @@ app.get("/api/health", (req, res) => {
     status: "OK", 
     message: "Chanakya AI is running!",
     apiKey: apiKey ? "Set" : "Not set"
+  });
+});
+
+// Test endpoint for debugging
+app.get("/api/test", (req, res) => {
+  res.json({ 
+    message: "API is working!",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 

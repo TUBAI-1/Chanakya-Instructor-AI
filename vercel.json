@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "api/*.js",
       "use": "@vercel/node"
     }
   ],
@@ -13,9 +13,20 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "/index.html"
     }
   ],
+  "functions": {
+    "api/ask.js": {
+      "maxDuration": 30
+    },
+    "api/health.js": {
+      "maxDuration": 10
+    },
+    "api/test.js": {
+      "maxDuration": 10
+    }
+  },
   "env": {
     "GEMINI_API_KEY": "@gemini-api-key"
   }

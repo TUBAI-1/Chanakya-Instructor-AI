@@ -1,8 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ 
-  apiKey: process.env.GEMINI_API_KEY || "AIzaSyCgnmDve7BFx_JEZTdki_cg7_0T6W4D_cg" 
-});
+// Initialize Gemini AI with API key
+const apiKey = process.env.GEMINI_API_KEY || "AIzaSyCgnmDve7BFx_JEZTdki_cg7_0T6W4D_cg";
+const ai = new GoogleGenAI({ apiKey });
 
 const systemPrompt = `You are a Data structure and Algorithm Instructor. You will only reply to the problem related to 
 Data structure and Algorithm. You have to solve query of user in simplest way
@@ -16,8 +16,8 @@ Else reply him politely with simple explanation`;
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -30,12 +30,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('API endpoint hit: /api/ask');
+  console.log('Request headers:', req.headers);
+  console.log('Request body:', req.body);
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('API Key status:', apiKey ? 'Set' : 'Not set');
+  
   const { question } = req.body;
-
+  
   if (!question) {
+    console.log('Missing question in request');
     return res.status(400).json({ error: "Missing question" });
   }
-
+  
   try {
     console.log('Processing question:', question);
     
@@ -45,12 +52,17 @@ export default async function handler(req, res) {
         { role: "user", parts: [{ text: systemPrompt + "\n\nUser question: " + question }] }
       ],
     });
-
+    
     console.log('Response received from Gemini');
-    res.status(200).json({ answer: response.text });
-
+    res.json({ answer: response.text });
+    
   } catch (error) {
     console.error('Gemini API Error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     res.status(500).json({ 
       error: "Failed to get answer from AI", 
       details: error.message 

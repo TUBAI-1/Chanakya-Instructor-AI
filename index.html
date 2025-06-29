@@ -785,6 +785,10 @@
             const API_URL = "/api/ask";
 
             try {
+                console.log('Sending request to:', API_URL);
+                console.log('Request payload:', { question });
+                console.log('Current URL:', window.location.href);
+                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -793,7 +797,18 @@
                     body: JSON.stringify({ question }),
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                console.log('Response URL:', response.url);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Response error text:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+
                 const data = await response.json();
+                console.log('Response data:', data);
 
                 if (data.answer) {
                     // Format code blocks and inline code
@@ -829,7 +844,20 @@
                 }
             } catch (error) {
                 console.error('Frontend Error:', error);
-                outputArea.innerHTML = `<div class="error-message"><i class="fas fa-bug"></i> Failed to get answer: ${error.message}</div>`;
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                let errorMessage = `Failed to get answer: ${error.message}`;
+                
+                // Provide more specific error messages
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = 'Network error: Unable to connect to the server. Please check your internet connection and try again.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Server error: The API server is not responding. This might be a deployment issue.';
+                }
+                
+                outputArea.innerHTML = `<div class="error-message"><i class="fas fa-bug"></i> ${errorMessage}<br><small>Check browser console for more details.</small></div>`;
             } finally {
                 askButton.disabled = false;
                 loadingIndicator.style.display = 'none';
